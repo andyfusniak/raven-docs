@@ -1,0 +1,1098 @@
+openapi: 3.0.3
+servers:
+  - description: Localhost testing
+    url: http://localhost:8080/v1
+  - description: Raven Mailer Live API
+    url: https://api.ravenmailer.com/v1
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/mr6502/raven/0.1.0
+info:
+  description: Raven Mailer templated SMTP delivery system
+  version: '0.1.0'
+  title: Raven Mailer API
+  contact:
+    email: support@ravenmailer.com
+tags:
+  - name: Projects
+    description: Project Management
+  - name: Transports
+    description: Email SMTP Server Transports
+  - name: Groups
+    description: Template Groups
+  - name: Templates
+    description: Email templates
+  - name: Mail
+    description: Mail scheduling and management
+paths:
+  /projects/{projectId}:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+    put:
+      tags:
+        - Projects
+      summary: Create a new project
+      operationId: createProject
+      description: Creates a new project for a user.
+      requestBody:
+        required: true
+        description: |
+          Create a new project for a user.
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                userId:
+                  $ref: '#/components/schemas/UserId'
+                name:
+                  type: string
+                  maxLength: 1000
+                  example: 'The Cloud Company'
+                  pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+                description:
+                  type: string
+                  maxLength: 2000
+                  example: >-
+                    The Cloud Company transactional email.
+                  pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+              required:
+                - userId
+                - name
+      responses:
+        '201':
+          description: project object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                board-exists:
+                  summary: A project with this id already exists.
+                  value:
+                    status: 409
+                    code: 'projects/project-exists'
+                    message: 'A project with this id already exists'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    get:
+      tags:
+        - Projects
+      summary: Get a project
+      operationId: getProject
+      description: Get a single project by project id.
+      responses:
+        '200':
+          description: project object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '404':
+          description: Project Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                project-not-found:
+                  summary: project not found
+                  value:
+                    status: 404
+                    code: 'projects/project-not-found'
+                    message: 'project not found'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects:
+    get:
+      tags:
+        - Projects
+      summary: List all projects
+      operationId: listProjects
+      description: |
+        Get a list of projects for a given user.
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          description: user identifier
+          schema:
+            $ref: '#/components/schemas/UserId'
+      responses:
+        '200':
+          description: list of project objects
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                    maxItems: 100
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/transports:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+    post:
+      tags:
+        - Transports
+      summary: Create a new transport
+      operationId: createTransport
+      description: |
+        Create a new transport for a project including the SMTP host, port username and password.
+      requestBody:
+        required: true
+        description: Create a new transport for a project.
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                  maxLength: 1000
+                  example: 'Amazon SES West Virginia Region'
+                  pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+                host:
+                  type: string
+                  format: hostname
+                  maxLength: 2000
+                  example: 'email-smtp.us-east-1.amazonaws.com'
+                port:
+                  type: integer
+                  minimum: 0
+                  maximum: 65353
+                  example: 587
+                username:
+                  type: string
+                  pattern: '^[a-zA-Z0-9]{1,256}$'
+                  example: 'AKIATCOJOXG43IYJENEB'
+                password:
+                  type: string
+                  maxLength: 512
+                  example: 'secretpassword'
+                emailFrom:
+                  type: string
+                  maxLength: 2000
+                  example: 'team@example.com'
+                emailReplyTo:
+                  type: string
+                  maxLength: 2000
+                  example: 'department@example.com'
+              required:
+                - name
+                - host
+                - port
+                - username
+                - password
+                - emailFrom
+      responses:
+        '201':
+          description: transport object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Transport'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    get:
+      tags:
+        - Transports
+      summary: List all transports
+      operationId: listTransports
+      description: >-
+        List all transports for a project.
+      responses:
+        '200':
+          description: array of transport objects
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transport'
+                    maxItems: 100
+        '404':
+          description: Project Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                project-not-found:
+                  summary: project not found
+                  value:
+                    status: 404
+                    code: 'projects/project-not-found'
+                    message: 'project not found'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/transports/{id}:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+      - name: id
+        in: path
+        required: true
+        description: transport identifier
+        schema:
+          $ref: '#/components/schemas/TransportId'
+    get:
+      tags:
+        - Transports
+      summary: Get a transport
+      operationId: getTransport
+      description: >-
+        Get a transport by id.
+      responses:
+        '200':
+          description: transport object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Transport'
+    patch:
+      tags:
+        - Transports
+      summary: Update a transport
+      operationId: updateTransport
+      requestBody:
+        description: Update a transport
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  $ref: '#/components/schemas/TransportNameProp'
+                host:
+                  $ref: '#/components/schemas/TransportHostProp'
+                port:
+                  $ref: '#/components/schemas/TransportPortProp'
+                username:
+                  $ref: '#/components/schemas/TransportUsernameProp'
+                password:
+                  $ref: '#/components/schemas/TransportPasswordProp'
+                emailFrom:
+                  $ref: '#/components/schemas/TransportEmailFromProp'
+                emailReplyTo:
+                  $ref: '#/components/schemas/TransportEmailReplyToProp'
+                active:
+                  $ref: '#/components/schemas/TransportActiveProp'
+      responses:
+        '200':
+          description: transport object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Transport'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    delete:
+      tags:
+        - Transports
+      summary: Delete a transport
+      operationId: deleteTransport
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Transport Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                transport-not-found:
+                  summary: transport not found
+                  value:
+                    status: 404
+                    code: 'transports/transport-not-found'
+                    message: 'transport not found'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/groups/{id}:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/groupId'
+    put:
+      tags:
+        - Groups
+      summary: Create a new group
+      operationId: createGroup
+      description: |
+        Creates a new group as a container for templates.
+      requestBody:
+        required: true
+        description: Create a new group within a project.
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                  maxLength: 1000
+                  example: 'Amazon SES West Virginia Region'
+                  pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+              required:
+                - name
+      responses:
+        '201':
+          description: group object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Group'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    get:
+      tags:
+        - Groups
+      summary: Get a group
+      operationId: getGroup
+      description: >-
+        Get a group by id.
+      responses:
+        '200':
+          description: group object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Group'
+    patch:
+      tags:
+        - Groups
+      summary: Update a template group
+      operationId: updateGroup
+      description: Update a group name
+      requestBody:
+          required: true
+          description: Update the name of a group.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  name:
+                    type: string
+                    maxLength: 1000
+                    example: 'Amazon SES West Virginia Region'
+                    pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+                required:
+                  - name
+      responses:
+        '200':
+          description: group object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Group'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    delete:
+      tags:
+        - Groups
+      summary: Delete a group
+      operationId: deleteGroup
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                group-not-found:
+                  summary: group not found
+                  value:
+                    status: 404
+                    code: 'groups/group-not-found'
+                    message: 'group not found'
+
+                group-contains-templates:
+                  summary: group contains templates
+                  value:
+                    status: 409
+                    code: 'groups/group-contains-templates'
+                    message: 'group cannot be deleted whilst it contains templates'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/groups:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+    get:
+      tags:
+        - Groups
+      summary: List all template groups
+      operationId: listGroups
+      description: List groups within a project.
+      responses:
+        '200':
+          description: array of group objects
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                    maxItems: 100
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/templates/{id}:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+      - name: id
+        in: path
+        required: true
+        description: template identifier
+        schema:
+          $ref: '#/components/schemas/TemplateId'
+    get:
+      tags:
+        - Templates
+      summary: Get a template
+      operationId: getTemplate
+      description: >-
+        Get a template by id.
+      responses:
+        '200':
+          description: template object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Template'
+    put:
+      tags:
+        - Templates
+      summary: Create a new template
+      operationId: createTemplate
+      description: >-
+        Create a new template within a project.
+      requestBody:
+        required: true
+        description: parameters to create a new template
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                groupId:
+                  $ref: '#/components/schemas/GroupId'
+                txt:
+                  $ref: '#/components/schemas/TemplateTxtProp'
+                html:
+                  $ref: '#/components/schemas/TemplateHTMLProp'
+      responses:
+        '201':
+          description: template object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Template'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                board-exists:
+                  summary: A template with this id already exists.
+                  value:
+                    status: 409
+                    code: 'templates/template-exists'
+                    message: 'A template with this id already exists'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    patch:
+      tags:
+        - Templates
+      summary: Update a template
+      operationId: updateTemplate
+      requestBody:
+        description: >-
+          Update one or more attributes of a template
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                groupId:
+                  $ref: '#/components/schemas/GroupId'
+                txt:
+                  $ref: '#/components/schemas/TemplateTxtProp'
+                html:
+                  $ref: '#/components/schemas/TemplateHTMLProp'
+      responses:
+        '200':
+          description: template object
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Template'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+    delete:
+      tags:
+        - Templates
+      summary: Delete a template
+      operationId: deleteTemplate
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                group-not-found:
+                  summary: template not found
+                  value:
+                    status: 404
+                    code: 'templates/template-not-found'
+                    message: 'template not found'
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/templates:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+    get:
+      tags:
+        - Templates
+      summary: List templates
+      operationId: listTemplates
+      description: >-
+        List all templates within a project.
+      responses:
+        '200':
+          description: array of template objects
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Template'
+                    maxItems: 100
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+  /projects/{projectId}/mail:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+    post:
+      tags:
+        - Mail
+      summary: Schedule mail for delivery.
+      operationId: sendMail
+      description: |
+        Schedules a new mail message for immediate delivery.
+      requestBody:
+        required: true
+        description: Send a mail message using the template with id `templateId` and parameters `params`.
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                templateId:
+                  $ref: '#/components/schemas/TemplateId'
+                emailTo:
+                  type: string
+                  format: email
+                  example: 'johndoe@example.com'
+                params:
+                  type: object
+              required:
+                - templateId
+                - emailTo
+                - params
+      responses:
+        'default':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                active-transport-not-found:
+                  summary: active transport not found
+                  value:
+                    status: 422
+                    code: 'email/active-transport-not-found'
+                    message: 'active transport not found'
+                unexpected-error:
+                  summary: unexpected error
+                  value:
+                    status: 409
+                    code: 'errors/unexpected-error'
+                    message: 'an unexpected error occurred'
+components:
+  parameters:
+    projectId:
+      name: projectId
+      in: path
+      required: true
+      description: Globally unique project identifier
+      schema:
+        $ref: '#/components/schemas/ProjectId'
+    groupId:
+      name: id
+      in: path
+      required: true
+      description: group identifier
+      schema:
+        $ref: '#/components/schemas/GroupId'
+  schemas:
+    UserId:
+      type: string
+      minLength: 28
+      maxLength: 28
+      example: 'dXjtqjXayte0fvfAXfTv3uyIjSj2'
+      description: A unique user identifier globally unique.
+      pattern: '^[A-Za-z0123456789]{28}$'
+    ProjectId:
+      type: string
+      minLength: 3
+      maxLength: 32
+      example: 'the-cloud-company'
+      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      description: A project identifier globally unique.
+    TransportId:
+      type: string
+      minLength: 6
+      maxLength: 6
+      example: 'tqWwUv'
+      description: Transport identifier unique within each project.
+      pattern: '^[A-Za-z0123456789]{6}$'
+    GroupId:
+      type: string
+      minLength: 1
+      maxLength: 500
+      example: 'alert-group'
+      description: Group identifier unique within each project.
+      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+    TemplateId:
+      type: string
+      minLength: 1
+      maxLength: 500
+      example: 'welcome-email'
+      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      description: Template identifier unique within each project.
+    TransportNameProp:
+      type: string
+      maxLength: 1000
+      example: 'Amazon SES West Virginia Region'
+      pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+    TransportHostProp:
+      type: string
+      format: hostname
+      maxLength: 2000
+      example: 'email-smtp.us-east-1.amazonaws.com'
+    TransportPortProp:
+      type: integer
+      minimum: 1
+      maximum: 65535
+      example: 587
+    TransportUsernameProp:
+      type: string
+      maxLength: 256
+      pattern: '^[a-zA-Z0-9]{1,256}$'
+      example: 'AKIATCOJOXG43IYJENEB'
+    TransportPasswordProp:
+      type: string
+      maxLength: 512
+      example: 'secretpassword'
+    TransportEmailFromProp:
+      type: string
+      maxLength: 2000
+      example: 'team@example.com'
+    TransportEmailReplyToProp:
+      type: string
+      maxLength: 2000
+      example: 'department@example.com'
+    TransportActiveProp:
+      type: boolean
+      example: true
+    Project:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectId'
+        userId:
+          $ref: '#/components/schemas/UserId'
+        name:
+          type: string
+          maxLength: 1000
+          example: 'The Cloud Company Project'
+          pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+        description:
+          type: string
+          maxLength: 2000
+          example: >-
+            The Cloud Company transactional email.
+          pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+        createdAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+        modifiedAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+    Transport:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/TransportId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        name:
+          $ref: '#/components/schemas/TransportNameProp'
+        host:
+          $ref: '#/components/schemas/TransportHostProp'
+        port:
+          $ref: '#/components/schemas/TransportPortProp'
+        username:
+          $ref: '#/components/schemas/TransportUsernameProp'
+        password:
+          $ref: '#/components/schemas/TransportPasswordProp'
+        emailFrom:
+          $ref: '#/components/schemas/TransportEmailFromProp'
+        emailReplyTo:
+          $ref: '#/components/schemas/TransportEmailReplyToProp'
+        active:
+          $ref: '#/components/schemas/TransportActiveProp'
+        createdAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+        modifiedAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+    TemplateTxtProp:
+      type: string
+      maxLength: 131072 # 128KiB
+      example: >-
+        Hi {{ .Name }},
+
+        Welcome to {{ .ProjectName }}.
+    TemplateHTMLProp:
+      type: string
+      maxLength: 131072 # 128KiB
+      example: >-
+        <h1>Hi {{ .Name }}</h1>
+        <p>Welcome to {{ .ProjectName }}.
+    Template:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/TemplateId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        groupId:
+          $ref: '#/components/schemas/GroupId'
+        txt:
+          $ref: '#/components/schemas/TemplateTxtProp'
+        html:
+          $ref: '#/components/schemas/TemplateHTMLProp'
+        createdAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+        modifiedAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+    Group:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/GroupId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        name:
+          type: string
+          maxLength: 500
+          example: 'Follower Alerts'
+          pattern: ^[a-zA-Z0-9 .'?!,@$#-_]*$
+        createdAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+        modifiedAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
+    Error:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: integer
+          example: 409
+        code:
+          type: string
+          example: 'links/link-not-found'
+          maxLength: 64
+          pattern: ^[a-z0-9]+\/[a-z0-9]+(?:-[a-z0-9]+)*$
+        message:
+          type: string
+          example: 'A link with this id not found'
+          maxLength: 1000
+          pattern: ^[0-9a-zA-Z ]+$
