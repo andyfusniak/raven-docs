@@ -4,9 +4,6 @@ servers:
     url: http://localhost:8080/v1
   - description: Raven Mailer Live API
     url: https://api.ravenmailer.com/v1
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/mr6502/raven/0.1.0
 info:
   description: Raven Mailer templated SMTP delivery system
   version: '0.1.0'
@@ -85,18 +82,7 @@ paths:
                     code: 'projects/project-exists'
                     message: 'A project with this id already exists'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     get:
       tags:
         - Projects
@@ -128,18 +114,7 @@ paths:
                     code: 'projects/project-not-found'
                     message: 'project not found'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects:
     get:
       tags:
@@ -170,18 +145,7 @@ paths:
                       $ref: '#/components/schemas/Project'
                     maxItems: 100
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/transports:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -213,6 +177,7 @@ paths:
                   example: 'email-smtp.us-east-1.amazonaws.com'
                 port:
                   type: integer
+                  format: int32
                   minimum: 0
                   maximum: 65353
                   example: 587
@@ -251,18 +216,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Transport'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     get:
       tags:
         - Transports
@@ -298,18 +252,7 @@ paths:
                     code: 'projects/project-not-found'
                     message: 'project not found'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/transports/{id}:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -337,6 +280,8 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Transport'
+        'default':
+          $ref: '#/components/responses/default'
     patch:
       tags:
         - Transports
@@ -379,18 +324,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Transport'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     delete:
       tags:
         - Transports
@@ -413,18 +347,7 @@ paths:
                     code: 'transports/transport-not-found'
                     message: 'transport not found'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/groups/{id}:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -464,18 +387,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Group'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     get:
       tags:
         - Groups
@@ -494,6 +406,8 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Group'
+        'default':
+          $ref: '#/components/responses/default'
     patch:
       tags:
         - Groups
@@ -528,18 +442,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Group'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     delete:
       tags:
         - Groups
@@ -569,18 +472,7 @@ paths:
                     code: 'groups/group-contains-templates'
                     message: 'group cannot be deleted whilst it contains templates'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/groups:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -605,18 +497,7 @@ paths:
                       $ref: '#/components/schemas/Group'
                     maxItems: 100
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/templates/{id}:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -644,6 +525,8 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Template'
+        'default':
+          $ref: '#/components/responses/default'
     put:
       tags:
         - Templates
@@ -691,18 +574,7 @@ paths:
                     code: 'templates/template-exists'
                     message: 'A template with this id already exists'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     patch:
       tags:
         - Templates
@@ -735,18 +607,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Template'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
     delete:
       tags:
         - Templates
@@ -769,18 +630,7 @@ paths:
                     code: 'templates/template-not-found'
                     message: 'template not found'
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/templates:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -806,18 +656,7 @@ paths:
                       $ref: '#/components/schemas/Template'
                     maxItems: 100
         'default':
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                unexpected-error:
-                  summary: unexpected error
-                  value:
-                    status: 409
-                    code: 'errors/unexpected-error'
-                    message: 'an unexpected error occurred'
+          $ref: '#/components/responses/default'
   /projects/{projectId}/mail:
     parameters:
       - $ref: '#/components/parameters/projectId'
@@ -842,9 +681,11 @@ paths:
                 emailTo:
                   type: string
                   format: email
+                  maxLength: 320
                   example: 'johndoe@example.com'
                 subject:
                   type: string
+                  maxLength: 988
                   pattern: ^[A-Za-z0123456789 '"!@#$%\^&*()_+\-\\=[\]|]{1,998}$
                   example: 'User johndoe liked your comment'
                 params:
@@ -854,7 +695,13 @@ paths:
                 - emailTo
                 - params
       responses:
-        'default':
+        '201':
+          description: mail object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mail'
+        '409':
           description: unexpected error
           content:
             application/json:
@@ -873,6 +720,31 @@ paths:
                     status: 409
                     code: 'errors/unexpected-error'
                     message: 'an unexpected error occurred'
+        'default':
+          $ref: '#/components/responses/default'
+    get:
+      tags:
+        - Mail
+      summary: List mail entries
+      operationId: listMail
+      description: >-
+        List all mail entries within a project.
+      responses:
+        '200':
+          description: array of mail objects
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Mail'
+                    maxItems: 100
+        'default':
+          $ref: '#/components/responses/default'
 components:
   parameters:
     projectId:
@@ -896,13 +768,13 @@ components:
       maxLength: 28
       example: 'dXjtqjXayte0fvfAXfTv3uyIjSj2'
       description: A unique user identifier globally unique.
-      pattern: '^[A-Za-z0123456789]{28}$'
+      pattern: ^[A-Za-z0123456789]{28}$
     ProjectId:
       type: string
       minLength: 3
       maxLength: 32
       example: 'the-cloud-company'
-      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
       description: A project identifier globally unique.
     TransportId:
       type: string
@@ -910,21 +782,27 @@ components:
       maxLength: 6
       example: 'tqWwUv'
       description: Transport identifier unique within each project.
-      pattern: '^[A-Za-z0123456789]{6}$'
+      pattern: ^[A-Za-z0123456789]{6}$
     GroupId:
       type: string
       minLength: 1
       maxLength: 500
       example: 'alert-group'
       description: Group identifier unique within each project.
-      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
     TemplateId:
       type: string
       minLength: 1
       maxLength: 500
       example: 'welcome-email'
-      pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
       description: Template identifier unique within each project.
+    MailId:
+      type: string
+      minLength: 20
+      maxLength: 20
+      pattern: ^[A-Za-z0123456789]{20}$
+      example: 9bzrfdsb8UyGLkfEVnKN
     TransportNameProp:
       type: string
       maxLength: 1000
@@ -937,26 +815,27 @@ components:
       example: 'email-smtp.us-east-1.amazonaws.com'
     TransportPortProp:
       type: integer
+      format: int32
       minimum: 1
       maximum: 65535
       example: 587
     TransportUsernameProp:
       type: string
       maxLength: 256
-      pattern: '^[a-zA-Z0-9]{1,256}$'
-      example: 'AKIATCOJOXG43IYJENEB'
+      pattern: ^[a-zA-Z0-9]{1,256}$
+      example: AKIATCOJOXG43IYJENEB
     TransportPasswordProp:
       type: string
       maxLength: 512
-      example: 'secretpassword'
+      example: secretpassword
     TransportEmailFromProp:
       type: string
       maxLength: 2000
-      example: 'team@example.com'
+      example: team@example.com
     TransportEmailReplyToProp:
       type: string
       maxLength: 2000
-      example: 'department@example.com'
+      example: department@example.com
     TransportActiveProp:
       type: boolean
       example: true
@@ -1083,6 +962,61 @@ components:
           format: date-time
           maxLength: 24
           example: '2017-07-21T17:32:28Z'
+    MailStatusProp:
+      type: string
+      enum:
+        - pending
+        - published
+        - recieved
+        - delivered
+      example: published
+    Mail:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/MailId'
+        templateId:
+          $ref: '#/components/schemas/TemplateId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        status:
+          $ref: '#/components/schemas/MailStatusProp'
+        emailTo:
+          type: string
+          format: email
+          maxLength: 320
+          example: johndoe@example.com
+        emailFrom:
+          type: string
+          format: email
+          maxLength: 320
+          example: support@ravenmailer.com
+        emailReplyTo:
+          type: string
+          maxLength: 320
+          example: support@ravenmailer.com
+        subject:
+          type: string
+          maxLength: 988
+          pattern: ^[A-Za-z0123456789 '"!@#$%\^&*()_+\-\\=[\]|]{1,998}$
+          example: User johndoe liked your comment
+        createdAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2022-10-03T15:10:31.902Z'
+        sendAt:
+          type: string
+          nullable: true
+          format: date-time
+          maxLength: 24
+          example: null
+        modifiedAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2022-10-03T15:10:31.902Z'
     Error:
       type: object
       additionalProperties: false
@@ -1100,3 +1034,17 @@ components:
           example: 'A link with this id not found'
           maxLength: 1000
           pattern: ^[0-9a-zA-Z ]+$
+  responses:
+   default:
+     description: unexpected error
+     content:
+       application/json:
+         schema:
+           $ref: '#/components/schemas/Error'
+         examples:
+           unexpected-error:
+             summary: unexpected error
+             value:
+               status: 409
+               code: 'errors/unexpected-error'
+               message: 'an unexpected error occurred'
