@@ -843,6 +843,10 @@ paths:
                   type: string
                   format: email
                   example: 'johndoe@example.com'
+                subject:
+                  type: string
+                  pattern: ^[A-Za-z0123456789 '"!@#$%\^&*()_+\-\\=[\]|]{1,998}$
+                  example: 'User johndoe liked your comment'
                 params:
                   type: object
               required:
