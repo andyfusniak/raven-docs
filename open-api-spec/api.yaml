@@ -59,7 +59,7 @@ paths:
                 - name
       responses:
         '201':
-          description: project object
+          description: project resource
           content:
             application/json:
               schema:
@@ -91,7 +91,7 @@ paths:
       description: Get a single project by project id.
       responses:
         '200':
-          description: project object
+          description: project resource
           content:
             application/json:
               schema:
@@ -101,18 +101,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/Project'
         '404':
-          description: Project Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                project-not-found:
-                  summary: project not found
-                  value:
-                    status: 404
-                    code: 'projects/project-not-found'
-                    message: 'project not found'
+          $ref: '#/components/responses/ProjectNotFound'
         'default':
           $ref: '#/components/responses/default'
   /projects:
@@ -132,7 +121,7 @@ paths:
             $ref: '#/components/schemas/UserId'
       responses:
         '200':
-          description: list of project objects
+          description: list of project resources
           content:
             application/json:
               schema:
@@ -206,15 +195,7 @@ paths:
                 - emailFrom
       responses:
         '201':
-          description: transport object
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Transport'
+          $ref: '#/components/responses/TransportResource'
         'default':
           $ref: '#/components/responses/default'
     get:
@@ -226,7 +207,7 @@ paths:
         List all transports for a project.
       responses:
         '200':
-          description: array of transport objects
+          description: array of transport resources
           content:
             application/json:
               schema:
@@ -239,24 +220,13 @@ paths:
                       $ref: '#/components/schemas/Transport'
                     maxItems: 100
         '404':
-          description: Project Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                project-not-found:
-                  summary: project not found
-                  value:
-                    status: 404
-                    code: 'projects/project-not-found'
-                    message: 'project not found'
+          $ref: '#/components/responses/ProjectNotFound'
         'default':
           $ref: '#/components/responses/default'
-  /projects/{projectId}/transports/{id}:
+  /projects/{projectId}/transports/{transportId}:
     parameters:
       - $ref: '#/components/parameters/projectId'
-      - name: id
+      - name: transportId
         in: path
         required: true
         description: transport identifier
@@ -268,18 +238,10 @@ paths:
       summary: Get a transport
       operationId: getTransport
       description: >-
-        Get a transport by id.
+        Get a transport by transportId.
       responses:
         '200':
-          description: transport object
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Transport'
+          $ref: '#/components/responses/TransportResource'
         'default':
           $ref: '#/components/responses/default'
     patch:
@@ -314,15 +276,7 @@ paths:
                   $ref: '#/components/schemas/TransportActiveProp'
       responses:
         '200':
-          description: transport object
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Transport'
+          $ref: '#/components/responses/TransportResource'
         'default':
           $ref: '#/components/responses/default'
     delete:
@@ -348,7 +302,7 @@ paths:
                     message: 'transport not found'
         'default':
           $ref: '#/components/responses/default'
-  /projects/{projectId}/groups/{id}:
+  /projects/{projectId}/groups/{groupId}:
     parameters:
       - $ref: '#/components/parameters/projectId'
       - $ref: '#/components/parameters/groupId'
@@ -377,15 +331,7 @@ paths:
                 - name
       responses:
         '201':
-          description: group object
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Group'
+          $ref: '#/components/responses/GroupResource'
         'default':
           $ref: '#/components/responses/default'
     get:
@@ -397,15 +343,9 @@ paths:
         Get a group by id.
       responses:
         '200':
-          description: group object
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Group'
+          $ref: '#/components/responses/GroupResource'
+        '404':
+          $ref: '#/components/responses/GroupNotFound'
         'default':
           $ref: '#/components/responses/default'
     patch:
@@ -432,15 +372,9 @@ paths:
                   - name
       responses:
         '200':
-          description: group object
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Group'
+          $ref: '#/components/responses/GroupResource'
+        '404':
+          $ref: '#/components/responses/GroupNotFound'
         'default':
           $ref: '#/components/responses/default'
     delete:
@@ -452,19 +386,14 @@ paths:
         '204':
           description: No Content
         '404':
-          description: Not Found
+          $ref: '#/components/responses/GroupNotFound'
+        '409':
+          description: Conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
-                group-not-found:
-                  summary: group not found
-                  value:
-                    status: 404
-                    code: 'groups/group-not-found'
-                    message: 'group not found'
-
                 group-contains-templates:
                   summary: group contains templates
                   value:
@@ -484,7 +413,7 @@ paths:
       description: List groups within a project.
       responses:
         '200':
-          description: array of group objects
+          description: array of group resources
           content:
             application/json:
               schema:
@@ -498,10 +427,10 @@ paths:
                     maxItems: 100
         'default':
           $ref: '#/components/responses/default'
-  /projects/{projectId}/templates/{id}:
+  /projects/{projectId}/templates/{templateId}:
     parameters:
       - $ref: '#/components/parameters/projectId'
-      - name: id
+      - name: templateId
         in: path
         required: true
         description: template identifier
@@ -516,7 +445,7 @@ paths:
         Get a template by id.
       responses:
         '200':
-          description: template object
+          description: template resource
           content:
             application/json:
               schema:
@@ -551,7 +480,7 @@ paths:
                   $ref: '#/components/schemas/TemplateHTMLProp'
       responses:
         '201':
-          description: template object
+          description: template resources
           content:
             application/json:
               schema:
@@ -597,7 +526,7 @@ paths:
                   $ref: '#/components/schemas/TemplateHTMLProp'
       responses:
         '200':
-          description: template object
+          description: template resource
           content:
             application/json:
               schema:
@@ -643,7 +572,7 @@ paths:
         List all templates within a project.
       responses:
         '200':
-          description: array of template objects
+          description: array of template resources
           content:
             application/json:
               schema:
@@ -731,7 +660,7 @@ paths:
         List all mail entries within a project.
       responses:
         '200':
-          description: array of mail objects
+          description: array of mail resources
           content:
             application/json:
               schema:
@@ -745,6 +674,36 @@ paths:
                     maxItems: 100
         'default':
           $ref: '#/components/responses/default'
+  /projects/{projectId}/mail/{mailId}/logs:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+      - name: mailId
+        in: path
+        required: true
+        description: mail identifier
+        schema:
+          $ref: '#/components/schemas/MailId'
+    get:
+      tags:
+        - Mail
+      summary: Get logs for a mail entry
+      operationId: listMailLogs
+      description: >-
+        Gets all log messages for an individual mail entry in chronological order.
+      responses:
+        '200':
+          description: array of mail-log resources
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MailLog'
+                    maxItems: 100
 components:
   parameters:
     projectId:
@@ -755,7 +714,7 @@ components:
       schema:
         $ref: '#/components/schemas/ProjectId'
     groupId:
-      name: id
+      name: groupId
       in: path
       required: true
       description: group identifier
@@ -803,6 +762,12 @@ components:
       maxLength: 20
       pattern: ^[A-Za-z0123456789]{20}$
       example: 9bzrfdsb8UyGLkfEVnKN
+    MailLogId:
+      type: string
+      minLength: 20
+      maxLength: 20
+      pattern: ^[A-Za-z0123456789]{20}$
+      example: hNmX4bpbLPWczTwnHT8W
     TransportNameProp:
       type: string
       maxLength: 1000
@@ -1017,6 +982,36 @@ components:
           format: date-time
           maxLength: 24
           example: '2022-10-03T15:10:31.902Z'
+    MailLog:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          $ref: '#/components/schemas/MailLogId'
+        mailId:
+          $ref: '#/components/schemas/MailId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        status:
+          type: string
+          maxLength: 32
+          pattern: ^[a-z]{6,32}$
+        smtpCode:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 600
+          example: 535
+        message:
+          type: string
+          example: SMTP error 535 authentication failed
+        data:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+          maxLength: 24
+          example: '2017-07-21T17:32:28Z'
     Error:
       type: object
       additionalProperties: false
@@ -1035,16 +1030,62 @@ components:
           maxLength: 1000
           pattern: ^[0-9a-zA-Z ]+$
   responses:
-   default:
-     description: unexpected error
-     content:
-       application/json:
-         schema:
-           $ref: '#/components/schemas/Error'
-         examples:
-           unexpected-error:
-             summary: unexpected error
-             value:
-               status: 409
-               code: 'errors/unexpected-error'
-               message: 'an unexpected error occurred'
+    ProjectNotFound:
+      description: Project Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            project-not-found:
+              summary: project not found
+              value:
+                status: 404
+                code: 'projects/project-not-found'
+                message: 'project not found'
+    TransportResource:
+      description: transport resource
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              data:
+                $ref: '#/components/schemas/Transport'
+    GroupResource:
+      description: group resource
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              data:
+                $ref: '#/components/schemas/Group'
+    GroupNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            group-not-found:
+              summary: group not found
+              value:
+                status: 404
+                code: groups/group-not-found
+                message: 'group not found'
+    default:
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            unexpected-error:
+              summary: unexpected error
+              value:
+                status: 409
+                code: 'errors/unexpected-error'
+                message: 'an unexpected error occurred'
