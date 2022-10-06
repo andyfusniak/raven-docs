@@ -674,15 +674,28 @@ paths:
                     maxItems: 100
         'default':
           $ref: '#/components/responses/default'
+  /projects/{projectId}/mail/{mailId}:
+    parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/mailId'
+    get:
+      tags:
+        - Mail
+      summary: Get a mail resource
+      operationId: getMail
+      description: >-
+        Get a single mail resource.
+      responses:
+        '200':
+          description: mail resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mail'
   /projects/{projectId}/mail/{mailId}/logs:
     parameters:
       - $ref: '#/components/parameters/projectId'
-      - name: mailId
-        in: path
-        required: true
-        description: mail identifier
-        schema:
-          $ref: '#/components/schemas/MailId'
+      - $ref: '#/components/parameters/mailId'
     get:
       tags:
         - Mail
@@ -720,6 +733,13 @@ components:
       description: group identifier
       schema:
         $ref: '#/components/schemas/GroupId'
+    mailId:
+      name: mailId
+      in: path
+      required: true
+      description: mail identifier
+      schema:
+        $ref: '#/components/schemas/MailId'
   schemas:
     UserId:
       type: string
